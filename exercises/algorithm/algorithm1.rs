@@ -76,6 +76,16 @@ impl<T> LinkedList<T> {
             length: 0,
             start: None,
             end: None,
+        };
+        if list_a.length==0 {
+            list_b
+        }else if list_b.length==0{
+            list_a
+        }else{
+            self.length=list_a.length + list_b.length;
+            let mut ai=1;
+            let mut bi=1;
+            if get_ith_node(list_a,ai).
         }
 	}
 }
