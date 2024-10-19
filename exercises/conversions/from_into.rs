@@ -40,10 +40,32 @@ impl Default for Person {
 // If while parsing the age, something goes wrong, then return the default of
 // Person Otherwise, then return an instantiated Person object with the results
 
-// I AM NOT DONE
 
 impl From<&str> for Person {
     fn from(s: &str) -> Person {
+        // 如果字符串是空的，返回默认值
+        if s.is_empty() {
+            return Person::default();
+        }
+
+        // 以逗号分割字符串
+        let parts: Vec<&str> = s.split(',').collect();
+
+        // 如果分割的部分数量少于2，或者名字为空，返回默认值
+        if parts.len() < 2 || parts[0].is_empty() || parts.len() > 2 {
+            return Person::default();
+        }
+
+        // 尝试解析年龄
+        if let Ok(age) = parts[1].parse::<usize>() {
+            Person {
+                name: parts[0].to_string(),
+                age,
+            }
+        } else {
+            // 解析年龄失败，返回默认值
+            Person::default()
+        }
     }
 }
 
