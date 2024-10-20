@@ -38,6 +38,9 @@ where
 
     pub fn add(&mut self, value: T) {
         //TODO
+        self.items.push(value);
+        self.count += 1;
+        self.swim(self.count);
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -58,7 +61,38 @@ where
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
         //TODO
-		0
+		let left = self.left_child_idx(idx);
+        let right = self.right_child_idx(idx);
+        
+        if right > self.count {
+            left // 如果没有右孩子，返回左孩子
+        } else if (self.comparator)(&self.items[left], &self.items[right]) {
+            left // 返回较优的孩子节点（最小堆选择较小的，最大堆选择较大的）
+        } else {
+            right
+        }
+    }
+
+    fn sink(&mut self, mut idx: usize) {
+        while self.children_present(idx) {
+            let smallest = self.smallest_child_idx(idx);
+            if !(self.comparator)(&self.items[smallest], &self.items[idx]) {
+                break;
+            }
+            self.items.swap(idx, smallest);
+            idx = smallest;
+        }
+    }
+
+    fn swim(&mut self, mut idx: usize) {
+        while idx > 1 {
+            let parent_idx = self.parent_idx(idx); // 先保存父节点的索引
+            if !(self.comparator)(&self.items[idx], &self.items[parent_idx]) {
+                break;
+            }
+            self.items.swap(idx, parent_idx); // 进行交换
+            idx = parent_idx; // 更新 idx
+        }
     }
 }
 
@@ -85,7 +119,15 @@ where
 
     fn next(&mut self) -> Option<T> {
         //TODO
-		None
+		if self.is_empty() {
+            return None;
+        }
+        let top = self.items.swap_remove(1); // 删除根节点
+        self.count -= 1;
+        if !self.is_empty() {
+            self.sink(1); // 调整堆
+        }
+        Some(top)
     }
 }
 

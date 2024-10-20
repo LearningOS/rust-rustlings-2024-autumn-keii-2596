@@ -30,6 +30,24 @@ impl Graph for UndirectedGraph {
     }
     fn add_edge(&mut self, edge: (&str, &str, i32)) {
         //TODO
+        let (from, to, weight) = edge;
+
+        // 添加起点节点
+        self.add_node(from);
+        // 添加终点节点
+        self.add_node(to);
+
+        // 添加从 `from` 到 `to` 的边
+        self.adjacency_table_mutable()
+            .get_mut(from)
+            .unwrap()
+            .push((to.to_string(), weight));
+
+        // 添加从 `to` 到 `from` 的边（无向图）
+        self.adjacency_table_mutable()
+            .get_mut(to)
+            .unwrap()
+            .push((from.to_string(), weight));
     }
 }
 pub trait Graph {
@@ -38,10 +56,32 @@ pub trait Graph {
     fn adjacency_table(&self) -> &HashMap<String, Vec<(String, i32)>>;
     fn add_node(&mut self, node: &str) -> bool {
         //TODO
-		true
+		if self.contains(node) {
+            return false;
+        }
+
+        // 节点不存在，添加到邻接表中，初始化为空向量
+        self.adjacency_table_mutable()
+            .insert(node.to_string(), Vec::new());
+        true
     }
     fn add_edge(&mut self, edge: (&str, &str, i32)) {
         //TODO
+        let (from, to, weight) = edge;
+
+        // 添加起点和终点节点
+        self.add_node(from);
+        self.add_node(to);
+
+        // 添加无向边：from -> to, to -> from
+        self.adjacency_table_mutable()
+            .get_mut(from)
+            .unwrap()
+            .push((to.to_string(), weight));
+        self.adjacency_table_mutable()
+            .get_mut(to)
+            .unwrap()
+            .push((from.to_string(), weight));
     }
     fn contains(&self, node: &str) -> bool {
         self.adjacency_table().get(node).is_some()

@@ -43,7 +43,8 @@ impl<T> LinkedList<T> {
             end: None,
         }
     }
-
+}
+impl<T: PartialOrd + Clone> LinkedList<T> {
     pub fn add(&mut self, obj: T) {
         let mut node = Box::new(Node::new(obj));
         node.next = None;
@@ -72,21 +73,43 @@ impl<T> LinkedList<T> {
 	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
 	{
 		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
-        };
-        if list_a.length==0 {
-            list_b
-        }else if list_b.length==0{
-            list_a
-        }else{
-            self.length=list_a.length + list_b.length;
-            let mut ai=1;
-            let mut bi=1;
-            if get_ith_node(list_a,ai).
+		let mut merged_list = LinkedList::new();
+        let mut a_ptr = list_a.start;
+        let mut b_ptr = list_b.start;
+
+        while let (Some(a), Some(b)) = (a_ptr, b_ptr) {
+            unsafe {
+                let a_val = &(*a.as_ptr()).val;
+                let b_val = &(*b.as_ptr()).val;
+
+                if *a_val <= *b_val {
+                    merged_list.add(a_val.clone());
+                    a_ptr = (*a.as_ptr()).next;
+                } else {
+                    merged_list.add(b_val.clone());
+                    b_ptr = (*b.as_ptr()).next;
+                }
+            }
         }
+
+        // Append remaining nodes from list_a
+        while let Some(a) = a_ptr {
+            unsafe {
+                let a_val = &(*a.as_ptr()).val;
+                merged_list.add(a_val.clone());
+                a_ptr = (*a.as_ptr()).next;
+            }
+        }
+
+        // Append remaining nodes from list_b
+        while let Some(b) = b_ptr {
+            unsafe {
+                let b_val = &(*b.as_ptr()).val;
+                merged_list.add(b_val.clone());
+                b_ptr = (*b.as_ptr()).next;
+            }
+        }
+        merged_list
 	}
 }
 
